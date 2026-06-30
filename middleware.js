@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const REFRESH_TOKEN_COOKIE = 'refreshToken';
+const REFRESH_TOKEN_COOKIE = 'isAuthenticated';
 
 const PUBLIC_PATHS = [
   '/login',
