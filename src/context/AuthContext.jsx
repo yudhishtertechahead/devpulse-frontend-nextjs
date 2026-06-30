@@ -30,6 +30,7 @@ export function AuthProvider({ children }) {
         setAccessToken(null);
         setUser(null);
         updateLocalToken(null);
+        document.cookie = 'isAuthenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
         router.replace('/login');
       },
     });
@@ -39,6 +40,7 @@ export function AuthProvider({ children }) {
         const token = data.accessToken;
         setAccessToken(token);
         updateLocalToken(token);
+        document.cookie = 'isAuthenticated=true; path=/; max-age=604800';
 
         const meRes = await authGetMe();
         setUser(meRes.data.data);
@@ -57,6 +59,7 @@ export function AuthProvider({ children }) {
 
     setAccessToken(token);
     updateLocalToken(token);
+    document.cookie = 'isAuthenticated=true; path=/; max-age=604800';
 
     const meRes = await authGetMe();
     const me = meRes.data.data;
@@ -86,6 +89,7 @@ export function AuthProvider({ children }) {
     setAccessToken(null);
     setUser(null);
     updateLocalToken(null);
+    document.cookie = 'isAuthenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     router.replace('/login');
   }, [router]);
 
