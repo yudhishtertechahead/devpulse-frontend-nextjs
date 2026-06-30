@@ -9,7 +9,8 @@ export default function ActiveQuizView({
   quizQuestions,
   selectedDifficulty,
   setViewMode,
-  initialStartTime
+  initialStartTime,
+  onQuizComplete,
 }) {
   const [userAnswers, setUserAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,6 +72,7 @@ export default function ActiveQuizView({
 
       const res = await submitQuizResult(payload);
       setQuizResult(res.data || payload);
+      onQuizComplete?.();
     } catch (error) {
       console.error("Error submitting quiz:", error);
       alert("Failed to submit quiz to backend. See console.");

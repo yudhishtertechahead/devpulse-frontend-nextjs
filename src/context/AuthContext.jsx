@@ -59,9 +59,17 @@ export function AuthProvider({ children }) {
     updateLocalToken(token);
 
     const meRes = await authGetMe();
-    setUser(meRes.data.data);
+    const me = meRes.data.data;
+    setUser(me);
 
-    router.replace('/');
+    // Redirect admins to /admin if they came via ?redirect=admin
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirectTarget = searchParams.get('redirect');
+    if (me?.role === 'admin' && redirectTarget === 'admin') {
+      router.replace('/admin');
+    } else {
+      router.replace('/');
+    }
   }, [router]);
 
   const register = useCallback(async ({ name, email, password, confirmPassword }) => {

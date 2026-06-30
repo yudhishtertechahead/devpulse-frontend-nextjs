@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { RefreshCw, LogOut, Sun, Moon, LifeBuoy } from 'lucide-react';
+import { RefreshCw, LogOut, Sun, Moon, Shield } from 'lucide-react';
+import Link from 'next/link';
 import '@/styles/DevPulseDashboard.css';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -9,13 +10,11 @@ import { useTheme } from '@/context/ThemeContext';
 import { fetchUsers } from '@/lib/api/fetchUsers';
 import { fetchPosts } from '@/lib/api/fetchPosts';
 import { fetchTodos } from '@/lib/api/fetchTodos';
-import { fetchTrivia } from '@/lib/api/fetchTrivia';
 import { fetchCountries } from '@/lib/api/fetchCountries';
 
 import { getUserStats } from '@/modules/userStats';
 import { getPostAnalysis } from '@/modules/postAnalysis';
 import { getProductivityStats } from '@/modules/productivityTracker';
-import { getTriviaStats } from '@/modules/triviaScorer';
 import { getCountryStats } from '@/modules/countryLookup';
 
 import OverviewPanel from './panels/OverviewPanel';
@@ -42,12 +41,11 @@ export default function DevPulseDashboard() {
     setErrors({});
     const start = Date.now();
 
-    const [usersRes, postsRes, todosRes, triviaRes, countriesRes] =
+    const [usersRes, postsRes, todosRes, countriesRes] =
       await Promise.allSettled([
         fetchUsers(),
         fetchPosts(),
         fetchTodos(),
-        fetchTrivia(),
         fetchCountries(),
       ]);
 
@@ -65,10 +63,6 @@ export default function DevPulseDashboard() {
       ? todosRes.value
       : (errs.todos = todosRes.reason.message, null);
 
-    const trivia = triviaRes.status === 'fulfilled'
-      ? triviaRes.value
-      : (errs.trivia = triviaRes.reason.message, null);
-
     const countries = countriesRes.status === 'fulfilled'
       ? countriesRes.value
       : (errs.countries = countriesRes.reason.message, null);
@@ -81,7 +75,6 @@ export default function DevPulseDashboard() {
         users: users ? getUserStats(users) : null,
         posts: posts && users ? getPostAnalysis(posts, users) : null,
         productivity: todos && users ? getProductivityStats(todos, users) : null,
-        trivia: trivia ? getTriviaStats(trivia) : null,
         countries: countries ? getCountryStats(countries) : null,
         rawUsers: users,
       });
@@ -111,6 +104,30 @@ export default function DevPulseDashboard() {
               </div>
               <span className="dashboard-user-name">{user.name}</span>
             </div>
+          )}
+          {user?.role === 'admin' && (
+            <Link
+              href="/admin"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '7px 13px',
+                borderRadius: 8,
+                background: 'rgba(79,70,229,0.12)',
+                color: 'var(--primary-color)',
+                fontSize: 13,
+                fontWeight: 600,
+                textDecoration: 'none',
+                border: '1px solid var(--primary-muted)',
+                transition: 'background 0.15s ease',
+              }}
+              id="admin-panel-link"
+              title="Open Admin Panel"
+            >
+              <Shield size={14} />
+              Admin Panel
+            </Link>
           )}
           <button className="theme-toggle-btn" onClick={toggleTheme} title="Toggle Theme">
             {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
@@ -171,7 +188,7 @@ export default function DevPulseDashboard() {
             )}
             {activeTab === 'Trivia' && (
               <ErrorBoundary boundaryName="Trivia">
-                <TriviaPanel data={dashData.trivia} />
+                <TriviaPanel />
               </ErrorBoundary>
             )}
             {activeTab === 'Countries' && (

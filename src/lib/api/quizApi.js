@@ -33,3 +33,12 @@ export const getQuizDetails = async (id) => {
   const response = await api.get(`/quizzes/${id}`);
   return response.data;
 };
+
+/**
+ * Fetches aggregated quiz analytics for the authenticated user.
+ * @returns {Promise<Object>} Stats payload with summary, byDifficulty, and scoreTrend
+ */
+export const getQuizStats = async () => {
+  const response = await api.get('/quizzes/stats');
+  return response.data;
+};

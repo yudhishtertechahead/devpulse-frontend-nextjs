@@ -1,14 +1,61 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Users, FileText, CheckSquare, Globe, HelpCircle } from 'lucide-react';
 import StatCard from '../shared/StatCard';
 import SectionTitle from '../shared/SectionTitle';
+import { useAuth } from '@/context/AuthContext';
+import { getQuizStats, getPastQuizzes } from '@/lib/api/quizApi';
+import {
+  normalizeQuizStats,
+  buildQuizStatsFromQuizzes,
+} from '@/modules/quizAnalytics';
 import '@/styles/OverviewPanel.css';
 
 export default function OverviewPanel({ data }) {
+  const { accessToken } = useAuth();
+  const [quizSummary, setQuizSummary] = useState(null);
+
+  useEffect(() => {
+    if (!accessToken) return;
+
+    let cancelled = false;
+
+    const loadQuizSummary = async () => {
+      try {
+        const response = await getQuizStats();
+        if (!cancelled) {
+          setQuizSummary(normalizeQuizStats(response).summary);
+        }
+      } catch (error) {
+        const status = error?.response?.status;
+        if (status === 404 || status === 501) {
+          try {
+            const historyResponse = await getPastQuizzes();
+            if (!cancelled) {
+              setQuizSummary(
+                buildQuizStatsFromQuizzes(historyResponse?.data || []).summary
+              );
+            }
+          } catch {
+            if (!cancelled) setQuizSummary(null);
+          }
+        } else if (!cancelled) {
+          setQuizSummary(null);
+        }
+      }
+    };
+
+    loadQuizSummary();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken]);
+
   if (!data) return <div className="error-card">Overview data unavailable</div>;
 
-  const { users, posts, productivity, trivia, countries } = data;
+  const { users, posts, productivity, countries } = data;
 
   return (
     <div className="overview-panel">
@@ -42,12 +89,16 @@ export default function OverviewPanel({ data }) {
             color="#10b981"
           />
         )}
-        {trivia && (
+        {quizSummary && (
           <StatCard
             icon={HelpCircle}
-            label="Trivia Questions"
-            value={trivia.total}
-            sub="loaded from Open Trivia DB"
+            label="Quiz Average"
+            value={`${quizSummary.averageScorePercent}%`}
+            sub={
+              quizSummary.totalQuizzes > 0
+                ? `from ${quizSummary.totalQuizzes} quizzes taken`
+                : 'No quizzes taken yet'
+            }
             color="#f59e0b"
           />
         )}
@@ -78,6 +129,11 @@ export default function OverviewPanel({ data }) {
           {productivity && (
             <div className="fact-item">
               Best productivity: <span>{productivity.ranked[0]?.name} ({productivity.ranked[0]?.completionRate}%)</span>
+            </div>
+          )}
+          {quizSummary && quizSummary.totalQuizzes > 0 && (
+            <div className="fact-item">
+              Best quiz score: <span>{quizSummary.bestScorePercent}%</span>
             </div>
           )}
           {countries && (
