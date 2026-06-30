@@ -1,0 +1,84 @@
+/* ── ErrorBoundary Fallback UI ─────────────────────────────────────────────
+   Uses the project's CSS custom properties so it automatically respects
+   both light and dark modes.
+──────────────────────────────────────────────────────────────────────────── */
+
+.eb-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2.5rem 2rem;
+  margin: 1rem 0;
+  border-radius: 12px;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
+  text-align: center;
+  animation: eb-fade-in 0.25s ease;
+}
+
+@keyframes eb-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.eb-icon {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.35));
+}
+
+.eb-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--error-text);
+  margin: 0;
+}
+
+.eb-message {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  max-width: 36ch;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.eb-error-id {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.eb-error-id code {
+  font-family: 'Courier New', monospace;
+  background: var(--surface-alt-color);
+  border: 1px solid var(--border-color);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.eb-retry-btn {
+  margin-top: 0.25rem;
+  padding: 0.45rem 1.25rem;
+  border: 1px solid var(--error-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--error-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.1s ease;
+}
+
+.eb-retry-btn:hover {
+  background: var(--error-border);
+  transform: translateY(-1px);
+}
+
+.eb-retry-btn:active {
+  transform: translateY(0);
+}

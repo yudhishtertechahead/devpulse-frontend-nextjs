@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DevPulse Next.js Frontend
 
-## Getting Started
+Production-ready Next.js frontend for DevPulse. Connects to the existing Express API (`devpulse-api`) — the backend is unchanged.
 
-First, run the development server:
+## Architecture
+
+- **Frontend:** Next.js App Router on port **3001**
+- **Backend:** Express API on port **3000** (`devpulse-api`)
+- **Auth:** JWT access token (in-memory) + httpOnly refresh cookie (cross-origin with credentials)
+
+## Prerequisites
+
+- Node.js 20+
+- Running `devpulse-api` with PostgreSQL
+
+## Setup
 
 ```bash
+# Install dependencies
+npm install
+
+# Copy environment template
+cp .env.local.example .env.local
+
+# Start frontend (port 3001)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ensure the backend `.env` includes:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```env
+CORS_ORIGIN=http://localhost:3001
+FRONTEND_URL=http://localhost:3001
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Start the API separately:
 
-## Learn More
+```bash
+cd ../devpulse-api
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Dev server on http://localhost:3001 |
+| `npm run build` | Production build |
+| `npm start` | Serve production build on port 3001 |
+| `npm test` | Run Jest tests |
+| `npm run test:coverage` | Tests with coverage |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment variables
 
-## Deploy on Vercel
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `NEXT_PUBLIC_API_URL` | Express API base URL | `http://localhost:3000/api/v1` |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Production deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Build with standalone output:
+
+```bash
+npm run build
+npm start
+```
+
+Or use Docker:
+
+```bash
+docker build -t devpulse-web .
+docker run -p 3001:3001 -e NEXT_PUBLIC_API_URL=https://api.yourdomain.com/api/v1 devpulse-web
+```
+
+Set backend production env:
+
+```env
+CORS_ORIGIN=https://app.yourdomain.com
+FRONTEND_URL=https://app.yourdomain.com
+```
+
+## Project structure
+
+```
+src/
+├── app/           # App Router pages
+├── components/    # UI components and dashboard panels
+├── context/       # Auth and theme providers
+├── hooks/         # Shared hooks
+├── lib/api/       # Axios API layer
+├── modules/       # Pure business logic
+└── styles/        # CSS
+```

@@ -1,0 +1,47 @@
+.overview-panel {}
+
+.stats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.quick-facts {
+  background: var(--surface-color);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.fact-item {
+  background: var(--surface-alt-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-label);
+  border-left: 3px solid var(--primary-color);
+  transition: background 0.3s ease;
+}
+
+.fact-item span {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.error-card {
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: 12px;
+  padding: 24px;
+  color: var(--error-text);
+  text-align: center;
+}
